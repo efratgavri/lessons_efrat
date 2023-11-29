@@ -67,14 +67,12 @@ router.put("/:idEdit", async(req,res) => {
   }
 })
 
-
-//                           !
 router.delete("/:idDel",auth, async(req,res) => {
   try{
     let idDel = req.params.idDel
     // כדי שמשתמש יוכל למחוק רשומה הוא חייב 
     // שלרשומה יהיה את האיי די ביוזר איי די שלו
-    let data = await CountryModel.deleteOne({_id:idDel  ,user_id:req.tokenData._id})
+    let data = await CountryModel.deleteOne({_id:idDel,user_id:req.tokenData._id})
     // "deletedCount": 1 -  אם יש הצלחה של מחיקה
     res.json(data);
   }

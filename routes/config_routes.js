@@ -7,5 +7,5 @@ exports.routesInit = (app) => {
   app.use("/",indexR);
   app.use("/users",usersR);
   app.use("/cakes",cakesR)
-  app.use("/countries",countriesR);
+  app.use("/countries",countriesR)
 }
