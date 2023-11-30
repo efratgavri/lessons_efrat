@@ -8,7 +8,7 @@ async function main() {
 
     // await mongoose.connect('mongodb://127.0.0.1:27017/maor23');
     // await mongoose.connect(`mongodb+srv://EfratGavriel:e213278765@cluster0.foomjir.mongodb.net/Efrat1234`);
-    await mongoose.connect(`mongodb+srv://${config.userDb}:${config.passDb}@cluster0.foomjir.mongodb.net/Efrat1234`);
+    await mongoose.connect(`mongodb+srv://${config.userDb}:${config.passDb}@cluster0.foomjir.mongodb.net/EfratTois`);
 
     console.log("mongo connect started1111");
  
