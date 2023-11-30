@@ -28,7 +28,7 @@ router.get("/", async (req, res) => {
     }
 
 })
-
+///https://lesson-try.onrender.com/tois/
 router.post("/", auth, async (req, res) => {
     let valdiateBody = validateToy(req.body);
     if (valdiateBody.error) {
@@ -53,23 +53,7 @@ router.post("/", auth, async (req, res) => {
 
 
 
-// /tois/search?s=
-// router.get("/search", async (req, res) => {
-//     try {
-//         let queryS = req.query.s;
-//         // מביא את החיפוש בתור ביטוי ולא צריך את כל הביטוי עצמו לחיפוש
-//         // i -> מבטל את כל מה שקשור ל CASE SENSITVE
-//         let searchReg = new RegExp(queryS, "i")
-//         let data = await ToyModel.find({ name: searchReg })
-//             .limit(50)
-//         res.json(data);
-//     }
-//     catch (err) {
-//         console.log(err);
-//         res.status(500).json({ msg: "there error try again later", err })
-//     }
-// })
-//search?=Coffee Maker
+//https://lesson-try.onrender.com/tois/search?s=laptop
 router.get("/search", async (req, res) => {
     try {
         let queryS = req.query.s;
@@ -141,6 +125,8 @@ router.put("/:editId",auth, async(req,res) => {
       res.status(500).json({msg:"there error try again later",err})
     }
   })
+
+
 ///https://lesson-try.onrender.com/tois/category?category=Electronics
   router.get("/category", async (req, res) => {
     try {
@@ -162,6 +148,7 @@ router.put("/:editId",auth, async(req,res) => {
         res.status(500).json({ msg: "התרחשה שגיאה, אנא נסה שוב מאוחר יותר", err });
     }
 });
+
 //https://lesson-try.onrender.com/tois/prices?perPage=10&&min=20&max=80
 router.get("/prices", async (req, res) => {
   let perPage = req.query.perPage || 5;

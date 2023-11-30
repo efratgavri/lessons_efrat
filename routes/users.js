@@ -8,7 +8,7 @@ const router = express.Router();
 router.get("/" , async(req,res)=> {
   res.json({msg:"Users work"})
 })
-
+//https://lesson-try.onrender.com/users/myInfo
 // אזור שמחזיר למשתמש את הפרטים שלו לפי הטוקן שהוא שולח
 router.get("/myInfo",auth, async(req,res) => {
   try{
@@ -63,33 +63,76 @@ router.post("/", async(req,res) => {
   }
 })
 
+// האדמין יוכל למחוק את כל הרשומות ויוזרים יוכלו למחוק רק את של עצמם
+  
+router.delete("/:delId",auth, async(req,res) => {
+  try{
+    let delId = req.params.delId;
+    let data;
+    // אם אדמין יכול למחוק כל רשומה אם לא בודק שהמשתמש
+    // הרשומה היוזר איי די שווה לאיי די של המשתמש
+    if(req.tokenData.role == "admin"){
+      data = await UserModel.deleteOne({_id:delId})
+    }
+    else{
+      data = await UserModel.deleteOne({_id:delId,_id:req.tokenData._id})
+    }
+    res.json(data);
+  }
+  catch(err){
+    console.log(err);
+    res.status(500).json({msg:"there error try again later",err})
+  }
+})
 
-// שינוי בלוג אין אנחנו שולחים גם רול בקייאט טוקן
-router.post("/login", async(req,res) => {
-  let validBody = validLogin(req.body);
+// האדמין יוכל לערוך את כל הרשומות ויוזרים יוכלו לערוך רק את של עצמם
+router.put("/:editId",auth, async(req,res) => {
+  let validBody = validUser(req.body);
   if(validBody.error){
-    // .details -> מחזיר בפירוט מה הבעיה צד לקוח
     return res.status(400).json(validBody.error.details);
   }
   try{
-    // קודם כל לבדוק אם המייל שנשלח קיים  במסד
-    let user = await UserModel.findOne({email:req.body.email})
-    if(!user){
-      return res.status(401).json({msg:"Password or email is worng ,code:1"})
+    let editId = req.params.editId;
+    let data;
+    if(req.tokenData.role == "admin"){
+      data = await UserModel.updateOne({_id:editId},req.body)
     }
-    // אם הסיסמא שנשלחה בבאדי מתאימה לסיסמא המוצפנת במסד של אותו משתמש
-    let authPassword = await bcrypt.compare(req.body.password,user.password);
-    if(!authPassword){
-      return res.status(401).json({msg:"Password or email is worng ,code:2"});
+    else{
+       data = await UserModel.updateOne({_id:editId,_id:req.tokenData._id},req.body)
     }
-    // מייצרים טוקן לפי שמכיל את האיידי של המשתמש
-    let token = createToken(user._id,user.role);
-    res.json({token});
+    res.json(data);
   }
   catch(err){
-    console.log(err)
-    res.status(500).json({msg:"err",err})
+    console.log(err);
+    res.status(500).json({msg:"there error try again later",err})
   }
 })
+// שינוי בלוג אין אנחנו שולחים גם רול בקייאט טוקן
+// router.post("/login", async(req,res) => {
+//   let validBody = validLogin(req.body);
+//   if(validBody.error){
+//     // .details -> מחזיר בפירוט מה הבעיה צד לקוח
+//     return res.status(400).json(validBody.error.details);
+//   }
+//   try{
+//     // קודם כל לבדוק אם המייל שנשלח קיים  במסד
+//     let user = await UserModel.findOne({email:req.body.email})
+//     if(!user){
+//       return res.status(401).json({msg:"Password or email is worng ,code:1"})
+//     }
+//     // אם הסיסמא שנשלחה בבאדי מתאימה לסיסמא המוצפנת במסד של אותו משתמש
+//     let authPassword = await bcrypt.compare(req.body.password,user.password);
+//     if(!authPassword){
+//       return res.status(401).json({msg:"Password or email is worng ,code:2"});
+//     }
+//     // מייצרים טוקן לפי שמכיל את האיידי של המשתמש
+//     let token = createToken(user._id,user.role);
+//     res.json({token});
+//   }
+//   catch(err){
+//     console.log(err)
+//     res.status(500).json({msg:"err",err})
+//   }
+// })
 
 module.exports = router;
