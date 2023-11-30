@@ -74,13 +74,17 @@ router.get("/search", async (req, res) => {
     try {
         let queryS = req.query.s;
         let searchReg = new RegExp(queryS, "i");
+        let perPage = 10;
+        let page = req.query.page || 1;
 
         let data = await ToyModel.find({
             $or: [
                 { name: searchReg },
                 { info: searchReg }
             ]
-        }).limit(5);
+        })
+        .limit(perPage)
+            .skip((page - 1) * perPage);;
 
         res.json(data);
     }
@@ -157,6 +161,30 @@ router.put("/:editId",auth, async(req,res) => {
         console.log(err);
         res.status(500).json({ msg: "התרחשה שגיאה, אנא נסה שוב מאוחר יותר", err });
     }
+});
+
+router.get("/prices", async (req, res) => {
+  let perPage = req.query.perPage || 5;
+  let page = req.query.page || 1;
+
+  // Extracting minimum and maximum price from query parameters
+  let minPrice = req.query.min || 0;
+  let maxPrice = req.query.max || Number.MAX_SAFE_INTEGER;
+
+  try {
+    let data = await ToyModel.find({
+      // Filtering by price within the specified range
+      price: { $gte: minPrice, $lte: maxPrice }
+    })
+      .limit(perPage)
+      .skip((page - 1) * perPage)
+      .sort({ _id: -1 });
+
+    res.json(data);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ msg: "There was an error, please try again later", err });
+  }
 });
 
 
