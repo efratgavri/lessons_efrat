@@ -83,7 +83,7 @@ router.get("/search", async (req, res) => {
                 { info: searchReg }
             ]
         })
-        .limit(perPage)
+        .limit(1)
             .skip((page - 1) * perPage);;
 
         res.json(data);
