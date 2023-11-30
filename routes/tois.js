@@ -4,7 +4,7 @@ const { ToyModel, validateToy } = require("../models/toyModel")
 const router = express.Router();
 
 
-
+//https://lesson-try.onrender.com/tois/
 router.get("/", async (req, res) => {
     // Math.min -> המספר המקסימלי יהיה 20 כדי שהאקר לא ינסה
     // להוציא יותר אם אין צורך בזה מבחינת הלקוח
@@ -69,7 +69,7 @@ router.post("/", auth, async (req, res) => {
 //         res.status(500).json({ msg: "there error try again later", err })
 //     }
 // })
-
+//search?=Coffee Maker
 router.get("/search", async (req, res) => {
     try {
         let queryS = req.query.s;
@@ -83,7 +83,7 @@ router.get("/search", async (req, res) => {
                 { info: searchReg }
             ]
         })
-        .limit(1)
+        .limit(perPage )
             .skip((page - 1) * perPage);;
 
         res.json(data);
@@ -162,7 +162,7 @@ router.put("/:editId",auth, async(req,res) => {
         res.status(500).json({ msg: "התרחשה שגיאה, אנא נסה שוב מאוחר יותר", err });
     }
 });
-
+//https://lesson-try.onrender.com/tois/prices?perPage=10&&min=20&max=80
 router.get("/prices", async (req, res) => {
   let perPage = req.query.perPage || 5;
   let page = req.query.page || 1;
