@@ -15,7 +15,7 @@ router.get("/", async (req, res) => {
     let reverse = req.query.reverse == "yes" ? -1 : 1;
 
     try {
-        let data = await CountryModel
+        let data = await ToyModel
             .find({})
             .limit(perPage)
             .skip((page - 1) * perPage)
@@ -137,7 +137,7 @@ router.put("/:editId",auth, async(req,res) => {
       res.status(500).json({msg:"there error try again later",err})
     }
   })
-///category?category=action&page=2
+///https://lesson-try.onrender.com/tois/category?category=Electronics
   router.get("/category", async (req, res) => {
     try {
         let perPage = 10;
