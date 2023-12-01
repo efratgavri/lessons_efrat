@@ -174,5 +174,23 @@ router.get("/prices", async (req, res) => {
   }
 });
 
+//חסר לפי id
+router.get("/single/:id", async (req, res) => {
+  const itemId = req.params.id;
+
+  try {
+    const data = await ToyModel.findById(itemId);
+
+    if (!data) {
+      return res.status(404).json({ msg: "לא נמצאה רשומה עם המזהה שסופק" });
+    }
+
+    res.json(data);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ msg: "התרחשה שגיאה, אנא נסה שוב מאוחר יותר", err });
+  }
+});
+
 
 module.exports = router;
