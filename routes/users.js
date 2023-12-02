@@ -5,6 +5,9 @@ const {auth, authAdmin} = require("../middlewares/auth");
 const {UserModel,validUser, validLogin,createToken} = require("../models/userModel")
 const router = express.Router();
 
+
+
+//https://lesson-try.onrender.com/users/
 router.get("/" , async(req,res)=> {
   res.json({msg:"Users work"})
 })
@@ -35,7 +38,7 @@ router.get("/usersList", authAdmin , async(req,res) => {
 })
 
 
-
+//https://lesson-try.onrender.com/users/
 router.post("/", async(req,res) => {
   let validBody = validUser(req.body);
   // במידה ויש טעות בריק באדי שהגיע מצד לקוח
@@ -86,53 +89,83 @@ router.delete("/:delId",auth, async(req,res) => {
 })
 
 // האדמין יוכל לערוך את כל הרשומות ויוזרים יוכלו לערוך רק את של עצמם
-router.put("/:editId",auth, async(req,res) => {
-  let validBody = validUser(req.body);
-  if(validBody.error){
-    return res.status(400).json(validBody.error.details);
-  }
-  try{
-    let editId = req.params.editId;
-    let data;
-    if(req.tokenData.role == "admin"){
-      data = await UserModel.updateOne({_id:editId},req.body)
-    }
-    else{
-       data = await UserModel.updateOne({_id:editId,_id:req.tokenData._id},req.body)
-    }
-    res.json(data);
-  }
-  catch(err){
-    console.log(err);
-    res.status(500).json({msg:"there error try again later",err})
-  }
-})
-// שינוי בלוג אין אנחנו שולחים גם רול בקייאט טוקן
-// router.post("/login", async(req,res) => {
-//   let validBody = validLogin(req.body);
+// router.put("/:editId",auth, async(req,res) => {
+//   let validBody = validUser(req.body);
 //   if(validBody.error){
-//     // .details -> מחזיר בפירוט מה הבעיה צד לקוח
 //     return res.status(400).json(validBody.error.details);
 //   }
 //   try{
-//     // קודם כל לבדוק אם המייל שנשלח קיים  במסד
-//     let user = await UserModel.findOne({email:req.body.email})
-//     if(!user){
-//       return res.status(401).json({msg:"Password or email is worng ,code:1"})
+//     let editId = req.params.editId;
+//     let data;
+//     if(req.tokenData.role == "admin"){
+//       data = await UserModel.updateOne({_id:editId},req.body)
 //     }
-//     // אם הסיסמא שנשלחה בבאדי מתאימה לסיסמא המוצפנת במסד של אותו משתמש
-//     let authPassword = await bcrypt.compare(req.body.password,user.password);
-//     if(!authPassword){
-//       return res.status(401).json({msg:"Password or email is worng ,code:2"});
+//     else{
+//        data = await UserModel.updateOne({_id:editId,_id:req.tokenData._id},req.body)
 //     }
-//     // מייצרים טוקן לפי שמכיל את האיידי של המשתמש
-//     let token = createToken(user._id,user.role);
-//     res.json({token});
+//     res.json(data);
 //   }
 //   catch(err){
-//     console.log(err)
-//     res.status(500).json({msg:"err",err})
+//     console.log(err);
+//     res.status(500).json({msg:"there error try again later",err})
 //   }
 // })
+router.put("/:idEdit", auth, async (req, res) => {
+  let idEdit = req.params.idEdit;
+  let validBody = userValid(req.body);
+  if (validBody.error) {
+    return res.status(400).json(validBody.error.details);
+  }
+  try{
+
+    let data;
+    if (req.tokenData._role == "admin") {
+      req.body.password = await bcrypt.hash(req.body.password, 10)
+
+      data = await UserModel.updateOne({ _id: idEdit }, req.body);
+    }
+    else if (idEdit == req.tokenData.user_id) {
+      req.body.password = await bcrypt.hash(req.body.password, 10)
+
+      data = await UserModel.updateOne({ _id: idEdit }, req.body);
+    }
+    else {
+      data = [{ status: "failed", msg: "You are trying to do an operation that is not enabled!" }]
+    }
+    res.json(data);
+
+  }
+  catch (err) {
+    console.log(err);
+    res.status(500).json({ err })
+  }
+})
+// שינוי בלוג אין אנחנו שולחים גם רול בקייאט טוקן
+router.post("/login", async(req,res) => {
+  let validBody = validLogin(req.body);
+  if(validBody.error){
+    // .details -> מחזיר בפירוט מה הבעיה צד לקוח
+    return res.status(400).json(validBody.error.details);
+  }
+  try{
+    // קודם כל לבדוק אם המייל שנשלח קיים  במסד
+    let user = await UserModel.findOne({email:req.body.email})
+    if(!user){
+      return res.status(401).json({msg:"Password or email is worng ,code:1"})
+    }
+    // אם הסיסמא שנשלחה בבאדי מתאימה לסיסמא המוצפנת במסד של אותו משתמש
+    let authPassword = await bcrypt.compare(req.body.password,user.password);
+    if(!authPassword){
+      return res.status(401).json({msg:"Password or email is worng ,code:2"});
+    }
+    // מייצרים טוקן לפי שמכיל את האיידי של המשתמש
+    let token = createToken(user._id,user.role);
+    res.json({token});
+  }
+  catch(err){
+    console.log(err)
+    res.status(500).json({msg:"err",err})
+  }
+})
 
 module.exports = router;

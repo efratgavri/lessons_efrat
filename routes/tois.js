@@ -174,7 +174,7 @@ router.get("/prices", async (req, res) => {
   }
 });
 
-//חסר לפי id
+//https://lesson-try.onrender.com/tois/single/65687670c6e99d6e07462df4
 router.get("/single/:id", async (req, res) => {
   const itemId = req.params.id;
 
