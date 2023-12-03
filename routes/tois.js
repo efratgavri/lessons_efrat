@@ -1,6 +1,7 @@
 const express = require("express");
 const { auth } = require("../middlewares/auth");
-const { ToyModel, validateToy } = require("../models/toyModel")
+const { ToyModel, validateToy } = require("../models/toyModel");
+const { date } = require("joi");
 const router = express.Router();
 
 
@@ -86,17 +87,35 @@ router.put("/:editId",auth, async(req,res) => {
     if(validBody.error){
       return res.status(400).json(validBody.error.details);
     }
+   
     try{
       let editId = req.params.editId;
       let data;
+       let status;
       if(req.tokenData.role == "admin"){
         data = await ToyModel.updateOne({_id:editId},req.body)
+        status = [{
+          status:"200 success",
+          msg:"admin update"
+        }]
       }
       else{
          data = await ToyModel.updateOne({_id:editId,user_id:req.tokenData._id},req.body)
+         status = [{
+          status:"200 success",
+          msg:"user update"
+        }]
       }
-      res.json(data);
+      if(data.modifiedCount==0){
+        data=[{msg:"eror updete, you not update nothing or this toy not belong to you,try again"}];
+        status=[{
+          status:"faild",
+          msg:"enable update"
+        }]
+      }
+      res.json(data,status);
     }
+    
     catch(err){
       console.log(err);
       res.status(500).json({msg:"there error try again later",err})
