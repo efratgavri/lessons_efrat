@@ -105,7 +105,7 @@ router.put("/:editId",auth, async(req,res) => {
   
   
   // האדמין יוכל למחוק את כל הרשומות ויוזרים יוכלו למחוק רק את של עצמם
-  
+  //https://lesson-try.onrender.com/users/656c26da6db050fa810c3fb2
   router.delete("/:delId",auth, async(req,res) => {
     try{
       let delId = req.params.delId;
